@@ -7,13 +7,6 @@ RUN apt-get update && apt-get install -y curl xz-utils git
 ENV PATH=${PATH}:/usr/local/lib/nodejs/bin:/usr/local/go/bin:/gopath/bin
 ENV GOPATH=/gopath
 
-FROM base AS kubectl
-
-ARG KUBECTL_VERSION=v1.22.0
-
-RUN curl -vfL "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl" > /usr/local/bin/kubectl \
- && chmod +x /usr/local/bin/kubectl
-
 FROM base AS node
 
 ARG NODE_VERSION=v14.20.0
@@ -45,7 +38,6 @@ RUN curl -vfL https://github.com/kubernetes-sigs/kind/releases/download/${KIND_V
 
 FROM base
 
-COPY --from=kubectl /usr/local/bin/kubectl /usr/local/bin/kubectl
 COPY --from=node /usr/local/lib/nodejs /usr/local/lib/nodejs
 COPY --from=go /usr/local/go /usr/local/go
 COPY --from=go ${GOPATH} ${GOPATH}
