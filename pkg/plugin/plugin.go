@@ -15,7 +15,6 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	bsonPrim "go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 	mongoOpts "go.mongodb.org/mongo-driver/mongo/options"
 )
 
@@ -216,7 +215,7 @@ type jsonData struct {
 
 func connect(ctx context.Context, pCtx backend.PluginContext) (client *mongo.Client, errMsg string, err error, internalErr error) {
 	data := jsonData{}
-	err = json.Unmarshal([]byte(pCtx.DataSourceInstanceSettings.JSONData), &data)
+	err = json.Unmarshal(pCtx.DataSourceInstanceSettings.JSONData, &data)
 	if err != nil {
 		return nil, "", nil, err
 	}
@@ -228,6 +227,8 @@ func connect(ctx context.Context, pCtx backend.PluginContext) (client *mongo.Cli
 	username, hasUsername := pCtx.DataSourceInstanceSettings.DecryptedSecureJSONData["username"]
 	password, hasPassword := pCtx.DataSourceInstanceSettings.DecryptedSecureJSONData["password"]
 
+	opts := mongoOpts.Client()
+
 	if hasUsername {
 		if hasPassword {
 			mongoURL.User = url.UserPassword(username, password)
@@ -236,12 +237,9 @@ func connect(ctx context.Context, pCtx backend.PluginContext) (client *mongo.Cli
 		}
 	}
 
-	credential := options.Credential{
-		Username: username,
-		Password: password,
-	}
+	opts.ApplyURI(mongoURL.String())
 
-	mongoClient, err := mongo.Connect(ctx, mongoOpts.Client().ApplyURI(mongoURL.String()).SetAuth(credential))
+	mongoClient, err := mongo.Connect(ctx, opts)
 	if err != nil {
 		return nil, "Error while connecting to MongoDB: ", err, nil
 	}
