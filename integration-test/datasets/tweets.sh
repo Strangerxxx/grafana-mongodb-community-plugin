@@ -4,4 +4,4 @@
 mongorestore \
     --username "${MONGODB_ROOT_USER}" \
     --password "${MONGODB_ROOT_PASSWORD}" \
-    /mnt/host/grafana-mongodb-community-plugin/integration-test/datasets/download/tweets/dump/
+    /mnt/host/grafana-mongodb-community-datasource-plugin/integration-test/datasets/download/tweets/dump/

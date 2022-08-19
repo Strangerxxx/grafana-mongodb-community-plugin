@@ -1,5 +1,5 @@
 {
-  "name": "meln5674-mongodb-community",
+  "name": "mongodb-community-datasource",
   "version": "0.1.0",
   "description": "Community-supported MongoDB Datasource Plugin",
   "scripts": {
@@ -9,7 +9,7 @@
     "watch": "grafana-toolkit plugin:dev --watch",
     "sign": "grafana-toolkit plugin:sign",
     "start": "yarn watch",
-    "plugin": "rm -f meln5674-mongodb-community.zip; zip -r meln5674-mongodb-community.zip dist/ CHANGELOG.md",
+    "plugin": "rm -f meln5674-mongodb-community-datasource.zip; zip -r meln5674-mongodb-community-datasource.zip dist/ CHANGELOG.md",
     "backend": "go vet ./... && mage -v",
     "integration-test": "integration-test/run.sh"
   },

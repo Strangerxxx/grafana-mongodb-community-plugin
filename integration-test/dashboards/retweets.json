@@ -29,7 +29,7 @@
   "panels": [
     {
       "datasource": {
-        "type": "meln5674-mongodb-community",
+        "type": "mongodb-community-datasource",
         "uid": "GLlI6wg4z"
       },
       "fieldConfig": {
@@ -108,7 +108,7 @@
           "collection": "tweets",
           "database": "twitter",
           "datasource": {
-            "type": "meln5674-mongodb-community",
+            "type": "mongodb-community-datasource",
             "uid": "GLlI6wg4z"
           },
           "labelFields": [
@@ -147,7 +147,7 @@
         "multi": false,
         "name": "datasource",
         "options": [],
-        "query": "meln5674-mongodb-community",
+        "query": "mongodb-community-datasource",
         "queryValue": "",
         "refresh": 1,
         "regex": "",
@@ -169,7 +169,7 @@
           ]
         },
         "datasource": {
-          "type": "meln5674-mongodb-community",
+          "type": "mongodb-community-datasource",
           "uid": "${datasource}"
         },
         "definition": "twitter (tweets)",

@@ -9,7 +9,7 @@ fi
 
 export DOCKER_BUILDKIT=1
 
-IMAGE_REPO=localhost/meln5674/grafana-mongodb-community-plugin
+IMAGE_REPO=localhost/meln5674/grafana-mongodb-community-datasource-plugin
 
 IMAGE_TAG=$(md5sum build-env.Dockerfile | awk '{ print $1 }')
 

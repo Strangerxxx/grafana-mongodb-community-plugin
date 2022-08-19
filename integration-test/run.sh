@@ -20,7 +20,7 @@ rm -rf integration-test/datasets/download/tweets
 unzip integration-test/datasets/download/tweets.zip -d integration-test/datasets/download/tweets/
 
 export KUBECONFIG=${KUBECONFIG:-integration-test/kubeconfig}
-KIND_CLUSTER_NAME=${KIND_CLUSTER_NAME:-meln5674-mongodb-community-it}
+KIND_CLUSTER_NAME=${KIND_CLUSTER_NAME:-mongodb-community-datasource-it}
 if ! kind get clusters | grep -q "${KIND_CLUSTER_NAME}" ; then
     sed "s/hostPath: .*/hostPath: '${PWD//\//\\/}'/" < integration-test/kind.config.template > integration-test/kind.config
 
@@ -72,9 +72,9 @@ helm repo update
 NGINX_ARGS=(
     --set fullnameOverride=plugin-repo
     --set extraVolumes[0].name=plugin
-    --set extraVolumes[0].hostPath.path=/mnt/host/grafana-mongodb-community-plugin/
+    --set extraVolumes[0].hostPath.path=/mnt/host/grafana-mongodb-community-datasource-plugin/
     --set extraVolumeMounts[0].name=plugin
-    --set extraVolumeMounts[0].mountPath=/opt/bitnami/nginx/html/grafana-mongodb-community-plugin/
+    --set extraVolumeMounts[0].mountPath=/opt/bitnami/nginx/html/grafana-mongodb-community-datasource-plugin/
     --set service.type=ClusterIP
 )
 
@@ -86,9 +86,9 @@ MONGODB_ARGS=(
     --set initdbScriptsConfigMap=mongodb-init
     --set useStatefulSet=true
     --set extraVolumes[0].name=sample-data
-    --set extraVolumes[0].hostPath.path=/mnt/host/grafana-mongodb-community-plugin/integration-test/datasets/download
+    --set extraVolumes[0].hostPath.path=/mnt/host/grafana-mongodb-community-datasource-plugin/integration-test/datasets/download
     --set extraVolumeMounts[0].name=sample-data
-    --set extraVolumeMounts[0].mountPath=/mnt/host/grafana-mongodb-community-plugin/integration-test/datasets/download
+    --set extraVolumeMounts[0].mountPath=/mnt/host/grafana-mongodb-community-datasource-plugin/integration-test/datasets/download
 )
 
 helm upgrade --install --wait mongodb bitnami/mongodb "${MONGODB_ARGS[@]}"
@@ -107,13 +107,13 @@ GRAFANA_ARGS=(
 if [ -n "${INTEGRATION_TEST_DEV_MODE}" ]; then
     GRAFANA_ARGS+=(
         --set grafana.extraVolumes[0].name=plugin
-        --set grafana.extraVolumes[0].hostPath.path=/mnt/host/grafana-mongodb-community-plugin/
+        --set grafana.extraVolumes[0].hostPath.path=/mnt/host/grafana-mongodb-community-datasource-plugin/
         --set grafana.extraVolumeMounts[0].name=plugin
-        --set grafana.extraVolumeMounts[0].mountPath=/opt/bitnami/grafana/data/plugins/meln5674-mongodb-community
+        --set grafana.extraVolumeMounts[0].mountPath=/opt/bitnami/grafana/data/plugins/mongodb-community-datasource
     )
 else
     GRAFANA_ARGS+=( 
-        --set plugins='meln5674-mongodb-community=http://plugin-repo/grafana-mongodb-community-plugin/meln5674-mongodb-community.zip'
+        --set plugins='mongodb-community-datasource=http://plugin-repo/grafana-mongodb-community-datasource-plugin/mongodb-community-datasource.zip'
     )
 fi
 
@@ -135,7 +135,7 @@ else
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: grafana-mongodb-community-plugin-it
+  name: grafana-mongodb-community-datasource-plugin-it
 spec:
   backoffLimit: 0
   template:
@@ -154,28 +154,28 @@ spec:
                   -u admin:adminPassword \
                   -H 'accept: application/json, text/plain, */*' \
                   -H 'content-type: application/json' \
-                  --data-raw "\$(cat /mnt/host/grafana-mongodb-community-plugin/integration-test//queries/\${query}.json)"
+                  --data-raw "\$(cat /mnt/host/grafana-mongodb-community-datasource-plugin/integration-test//queries/\${query}.json)"
             done
         volumeMounts:
         - name: datasets
-          mountPath: /mnt/host/grafana-mongodb-community-plugin/integration-test/
+          mountPath: /mnt/host/grafana-mongodb-community-datasource-plugin/integration-test/
       volumes:
       - name: datasets
         hostPath:
-          path: /mnt/host/grafana-mongodb-community-plugin/integration-test/
+          path: /mnt/host/grafana-mongodb-community-datasource-plugin/integration-test/
          
 EOF
 
 
-    kubectl wait job/grafana-mongodb-community-plugin-it --for=condition=complete &
-    kubectl wait job/grafana-mongodb-community-plugin-it --for=condition=failed &
+    kubectl wait job/grafana-mongodb-community-datasource-plugin-it --for=condition=complete &
+    kubectl wait job/grafana-mongodb-community-datasource-plugin-it --for=condition=failed &
 
     wait -n
 
     kill $(jobs -p)
 
-    if ! kubectl wait job/grafana-mongodb-community-plugin-it --for=condition=complete --timeout=0; then
-        kubectl logs job/grafana-mongodb-community-plugin-it
+    if ! kubectl wait job/grafana-mongodb-community-datasource-plugin-it --for=condition=complete --timeout=0; then
+        kubectl logs job/grafana-mongodb-community-datasource-plugin-it
 
         echo
         exit 1

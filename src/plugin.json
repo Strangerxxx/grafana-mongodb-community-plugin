@@ -1,11 +1,11 @@
 {
   "$schema": "https://raw.githubusercontent.com/grafana/grafana/master/docs/sources/developers/plugins/plugin.schema.json",
   "type": "datasource",
-  "name": "mongodb-community",
-  "id": "meln5674-mongodb-community",
+  "name": "mongodb-community-datasource",
+  "id": "mongodb-community-datasource",
   "metrics": true,
   "backend": true,
-  "executable": "gpx_mongodb-community",
+  "executable": "gpx_mongodb-community-datasource",
   "info": {
     "description": "Community-supported MongoDB Datasource Plugin",
     "author": {
@@ -23,11 +23,11 @@
     "links": [
       {
         "name": "Website",
-        "url": "https://github.com/meln5674/grafana-mongodb-community-plugin"
+        "url": "https://github.com/strangerxxx/grafana-mongodb-community-datasource-plugin"
       },
       {
         "name": "License",
-        "url": "https://github.com/meln5674/grafana/mongodb-community-plugin/blob/master/LICENSE"
+        "url": "https://github.com/strangerxxx/grafana/mongodb-community-datasource-plugin/blob/master/LICENSE"
       }
     ],
     "screenshots": [],
