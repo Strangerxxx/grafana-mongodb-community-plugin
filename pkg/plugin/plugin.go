@@ -198,20 +198,30 @@ func (m *queryModel) getValues(doc map[string]interface{}, fieldTypes []data.Fie
 	}
 
 	for valueNum, valueKey := range m.ValueFields {
-		var value interface{}
+		fieldType := fieldTypes[valueNum]
 		valueValue, ok := doc[valueKey]
-		if !ok {
-			value = nil
-		} else if asTime, isTime := valueValue.(bsonPrim.DateTime); isTime {
-			value = asTime.Time()
-		} else {
-			value = valueValue
-		}
 
-		if fieldTypes[valueNum].Nullable() {
-			values = append(values, &value)
+		if !ok {
+			values = append(values, nil)
 		} else {
-			values = append(values, value)
+			timeValue := time.Time{}
+			if asTime, isTime := valueValue.(bsonPrim.DateTime); isTime {
+				timeValue = asTime.Time()
+			}
+
+			if fieldType.Nullable() {
+				if timeValue.IsZero() {
+					values = append(values, &valueValue)
+				} else {
+					values = append(values, &timeValue)
+				}
+			} else {
+				if timeValue.IsZero() {
+					values = append(values, valueValue)
+				} else {
+					values = append(values, timeValue)
+				}
+			}
 		}
 	}
 	return values, nil
