@@ -167,7 +167,7 @@ func (m *queryModel) getLabels(doc map[string]interface{}) data.Labels {
 	return data.Labels(labels)
 }
 
-func (m *queryModel) getValues(doc map[string]interface{}) ([]interface{}, error) {
+func (m *queryModel) getValues(doc map[string]interface{}, fieldTypes []data.FieldType) ([]interface{}, error) {
 	values := make([]interface{}, 0, m.numValues())
 	var err error
 	if m.QueryType == queryTypeTimeseries {
@@ -196,14 +196,22 @@ func (m *queryModel) getValues(doc map[string]interface{}) ([]interface{}, error
 		}
 		values = append(values, convertedTimestamp)
 	}
-	for _, valueKey := range m.ValueFields {
+
+	for valueNum, valueKey := range m.ValueFields {
+		var value interface{}
 		valueValue, ok := doc[valueKey]
 		if !ok {
-			values = append(values, nil)
+			value = nil
 		} else if asTime, isTime := valueValue.(bsonPrim.DateTime); isTime {
-			values = append(values, asTime.Time())
+			value = asTime.Time()
 		} else {
-			values = append(values, valueValue)
+			value = valueValue
+		}
+
+		if fieldTypes[valueNum].Nullable() {
+			values = append(values, &value)
+		} else {
+			values = append(values, value)
 		}
 	}
 	return values, nil
@@ -289,7 +297,7 @@ func (m *queryModel) parseQueryResultDocument(frames map[string]*data.Frame, doc
 		frame.SetFieldNames(m.getFrameFieldNames(labelsID)...)
 		frames[labelsID] = frame
 	}
-	row, err := m.getValues(doc)
+	row, err := m.getValues(doc, fieldTypes)
 	if err != nil {
 		return err
 	}
